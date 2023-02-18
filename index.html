@@ -35,22 +35,32 @@
           <div class="inc-dec">
             <form class="incrementForm">
               <h4>Increment</h4>
-              <input type="number" name="increment" class="lws-increment" />
+              <input
+                type="number"
+                name="increment"
+                class="lws-increment"
+                id="increment"
+              />
             </form>
             <form class="decrementForm">
               <h4>Decrement</h4>
-              <input type="number" name="decrement" class="lws-decrement" />
+              <input
+                type="number"
+                name="decrement"
+                class="lws-decrement"
+                id="decrement"
+              />
             </form>
           </div>
           <div class="numbers">
-            <h2 class="lws-singleResult">120</h2>
+            <h2 class="lws-singleResult" id="counter">120</h2>
           </div>
         </div>
       </div>
       <!-- for adding another matches -->
       <div class="add_match">
         <button class="btn lws-addMatch">Add Another Match</button>
-        <button class="lws-reset">
+        <button class="lws-reset" id="reset">
           <svg
             fill="none"
             width="24"
