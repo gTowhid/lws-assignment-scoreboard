@@ -3,6 +3,34 @@ const counterEl = document.getElementById('counter');
 const incrementEl = document.getElementById('increment');
 const decrementEl = document.getElementById('decrement');
 const resetEl = document.getElementById('reset');
+const addMatchEl = document.getElementById('addMatch');
+
+
+// action identifiers
+const INCREMENT = 'increment';
+const DECREMENT = 'decrement';
+const RESET = 'reset';
+
+// action creators
+const increment = (value) => {
+    return {
+        type: INCREMENT,
+        payload: value,
+      }
+}
+
+const decrement = (value) => {
+    return {
+        type: DECREMENT,
+        payload: value,
+      }
+}
+
+const reset = () => {
+    return {
+        type: RESET
+      }
+}
 
 // initial state
 const initialState = {
@@ -11,12 +39,12 @@ const initialState = {
 
 // create reducer function
 function counterReducer(state = initialState, action) {
-  if (action.type === 'increment') {
+  if (action.type === INCREMENT) {
     return {
       ...state,
       value: state.value + action.payload,
     };
-  } else if (action.type === 'decrement') {
+  } else if (action.type === DECREMENT) {
     return {
       ...state,
       value:
@@ -24,7 +52,7 @@ function counterReducer(state = initialState, action) {
           ? state.value - action.payload
           : 0,
     };
-  } else if (action.type === 'reset') {
+  } else if (action.type === RESET) {
     return {
       ...state,
       value: 0,
@@ -51,10 +79,9 @@ incrementEl.addEventListener('keypress', (e) => {
   if (e.code === 'Enter') {
     e.preventDefault();
 
-    store.dispatch({
-      type: 'increment',
-      payload: parseInt(e.target.value),
-    });
+    store.dispatch(increment(parseInt(e.target.value)));
+    
+    e.target.value = '';
   }
 });
 
@@ -62,15 +89,20 @@ decrementEl.addEventListener('keypress', (e) => {
   if (e.code === 'Enter') {
     e.preventDefault();
 
-    store.dispatch({
-      type: 'decrement',
-      payload: parseInt(e.target.value),
-    });
+    store.dispatch(decrement(parseInt(e.target.value)));
+    
+    e.target.value = '';
   }
 });
 
 resetEl.addEventListener('click', () => {
-  store.dispatch({
-    type: 'reset',
-  });
+  store.dispatch(reset());
 });
+
+
+addMatchEl.addEventListener('click', () => {
+    const node = document.querySelector(".match");
+    const clone = node.cloneNode(true);
+
+    document.querySelector(".all-matches").appendChild(clone).setAttribute('id', 'match2');
+ });
