@@ -1,73 +1,89 @@
-// select DOM elements
-const counterEl = document.getElementById('counter');
-const incrementEl = document.getElementById('increment');
-const decrementEl = document.getElementById('decrement');
-const resetEl = document.getElementById('reset');
 const addMatchEl = document.getElementById('addMatch');
+const allMatches = document.querySelector('.all-matches');
+const resetEl = document.getElementById('reset');
 
-
-// action identifiers
-const INCREMENT = 'increment';
-const DECREMENT = 'decrement';
-const RESET = 'reset';
-
-// action creators
-const increment = (value) => {
-    return {
-        type: INCREMENT,
-        payload: value,
-      }
-}
-
-const decrement = (value) => {
-    return {
-        type: DECREMENT,
-        payload: value,
-      }
-}
-
-const reset = () => {
-    return {
-        type: RESET
-      }
-}
+let selector = 2; // reference point for new match name
 
 // initial state
-const initialState = {
-  value: 0,
-};
+let initialState = {
+  1: 0,
+  active: 1,
+}
+
+// deleting existing match
+allMatches.addEventListener('click', (e) => {
+  if (e.target.parentNode.className === 'lws-delete') {
+    e.target.parentNode.parentNode.parentNode.remove();
+  }
+});
 
 // create reducer function
 function counterReducer(state = initialState, action) {
-  if (action.type === INCREMENT) {
+  
+  if (action.type === 'increment') {
     return {
       ...state,
-      value: state.value + action.payload,
+      [action.id]: state[action.id] + action.payload,
+      active: action.id
     };
-  } else if (action.type === DECREMENT) {
+  } else if (action.type === 'decrement') {
     return {
       ...state,
-      value:
-        (state.value - action.payload || state.value) > 0
-          ? state.value - action.payload
-          : 0,
+      [action.id]: (state[action.id] - action.payload || state[action.id]) > 0
+      ? state[action.id] - action.payload
+      : 0,
+      active: action.id
     };
-  } else if (action.type === RESET) {
+  } else if (action.type === 'addMatch') {
+
+    const node = document.querySelector('.match');
+    const clone = node.cloneNode(true);
+
+    document
+      .querySelector('.all-matches')
+      .appendChild(clone)
+      .setAttribute('id', `match${selector}`);
+    document
+      .getElementById(`match${selector}`)
+      .querySelector('.wrapper')
+      .querySelector('.lws-matchName').innerText = `Match ${selector}`;
+
+    selector++;
+
     return {
       ...state,
-      value: 0,
+      [action.id]: 0,
+      active: action.id
     };
+  } else if (action.type === 'reset') {
+
+    const resetState = {
+      ...state,
+    }
+
+    Object.keys(resetState).forEach((key) => {resetState[key] = 0});
+
+    return resetState;
   } else {
     return state;
   }
 }
+
 
 // create store
 const store = Redux.createStore(counterReducer);
 
 const render = () => {
   const state = store.getState();
-  counterEl.innerText = state.value;
+
+  if (state.active) {
+    const matchName = 'match' + state.active;
+    document.getElementById(`${matchName}`).querySelector('.numbers').querySelector('.lws-singleResult').innerText = state[state.active];
+  } else {
+    document.querySelectorAll('.lws-singleResult').forEach((el) => {
+      el.innerText = 0;
+    });
+  }
 };
 
 render();
@@ -75,34 +91,39 @@ render();
 store.subscribe(render);
 
 // event listeners
-incrementEl.addEventListener('keypress', (e) => {
+allMatches.addEventListener('keypress', (e) => {
   if (e.code === 'Enter') {
     e.preventDefault();
 
-    store.dispatch(increment(parseInt(e.target.value)));
-    
+    if (e.target.id === 'increment') {
+      store.dispatch({
+        type: 'increment',
+        id: (e.target.parentNode.parentNode.parentNode.id).charAt(e.target.parentNode.parentNode.parentNode.id.length - 1),
+        payload: parseInt(e.target.value),
+      });
+    }
+
+    else if (e.target.id === 'decrement') {
+      store.dispatch({
+        type: 'decrement',
+        id: (e.target.parentNode.parentNode.parentNode.id).charAt(e.target.parentNode.parentNode.parentNode.id.length - 1),
+        payload: parseInt(e.target.value),
+      });
+    }
+
     e.target.value = '';
   }
 });
 
-decrementEl.addEventListener('keypress', (e) => {
-  if (e.code === 'Enter') {
-    e.preventDefault();
-
-    store.dispatch(decrement(parseInt(e.target.value)));
-    
-    e.target.value = '';
-  }
+addMatchEl.addEventListener('click', () => {
+  store.dispatch({
+    type: 'addMatch',
+    id: selector,
+  });
 });
 
 resetEl.addEventListener('click', () => {
-  store.dispatch(reset());
+  store.dispatch({
+    type: 'reset'
+  });
 });
-
-
-addMatchEl.addEventListener('click', () => {
-    const node = document.querySelector(".match");
-    const clone = node.cloneNode(true);
-
-    document.querySelector(".all-matches").appendChild(clone).setAttribute('id', 'match2');
- });
